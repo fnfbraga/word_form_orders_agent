@@ -8,6 +8,8 @@ An AI-powered application that helps users fill out movie order forms through a 
 - **Country Validation**: Automatically validates shipping countries
 - **Multiple Movies**: Add as many movies as you want to your order
 - **Document Preservation**: Maintains original formatting when filling the form
+- **Checkbox Support**: Automatically ticks checkboxes for selected movies
+- **Form Field Support**: Works with mail merge fields and content controls
 - **Real-time Streaming**: See agent responses as they're generated via SSE
 
 ## Architecture
@@ -19,8 +21,9 @@ An AI-powered application that helps users fill out movie order forms through a 
 │                 │     │  │     Google ADK Agent      │  │
 │  - File Upload  │◀────│  │  - inspect_form           │  │
 │  - Chat UI      │ SSE │  │  - validate_country       │  │
-│  - Download     │     │  │  - update_document        │  │
-└─────────────────┘     │  └───────────────────────────┘  │
+│  - Download     │     │  │  - update_name/street/... │  │
+└─────────────────┘     │  │  - add_movie              │  │
+                        │  └───────────────────────────┘  │
                         └─────────────────────────────────┘
 ```
 
@@ -77,27 +80,35 @@ An AI-powered application that helps users fill out movie order forms through a 
 
 ## Sample Document Template
 
-Create a Word document (`OrderForm.docx`) with the following structure:
+A sample template is provided in `samples/OrderForm.docx`. You can also generate one using:
+
+```bash
+cd samples
+python create_template.py
+```
+
+The template should have this structure:
 
 ```
-MOVIE ORDER FORM
+Movie Order Form
 ================
 
 Customer Information:
---------------------
-Name: ________________
-Street: ________________
-Postal Code and City: ________________
-Country: ________________
+- Name: ________________
+- Street: ________________
+- Postal Code and City: ________________
+- Country: ________________
 
 Movies Ordered:
---------------
 | Title          | Language    |
 |----------------|-------------|
 |                |             |
 ```
 
-The agent will detect these fields and the movie table automatically.
+The agent will detect these fields and the movie table automatically. It also supports:
+- Checkbox lists (☐ Movie Title → ☑ Movie Title when selected)
+- Mail merge fields (MERGEFIELD placeholders)
+- Content controls (form fields in Word)
 
 ## Usage
 
@@ -125,12 +136,10 @@ The agent will detect these fields and the movie table automatically.
 ## Tech Stack
 
 - **Frontend**: SvelteKit 2.0, TypeScript, Svelte 5
-- **Backend**: Python 3.10+, FastAPI, python-docx
+- **Backend**: Python 3.10+, FastAPI, python-docx, docx-mailmerge2
 - **AI**: Google ADK, Gemini 2.0 Flash
 - **Validation**: pycountry
 
 ## License
 
 MIT
-
-# word_form_orders_agent
